@@ -1,100 +1,93 @@
 const weather = {};
-const date = new Date;
-// var d = new Date(2018, 11, 24, 10, 33, 30, 0);
-const key = "&appid=976d88e8699f349aa3435ae965b66663";
+const date = new Date();
+const key = "976d88e8699f349aa3435ae965b66663";
+const city = document.querySelector("#search");
+const btn = document.querySelector("#button");
+const unit = document.querySelector("#unit");
 
-const output = document.querySelector(".output");
-const city = document.querySelector("#city");
-const unit = document.querySelector("#unit")
-const btn = document.querySelector(".enterbtn");
+const status = document.querySelector("#status");
+const locationElement = document.querySelector("#location");
+const temperature = document.querySelector("#temperature");
+const feelsLike = document.querySelector("#feelslike");
+const humidity = document.querySelector("#humidity");
+const windspeedElement = document.querySelector("#windspeed");
+const sunrise = document.querySelector("#sunrise");
+const sunset = document.querySelector("#sunset");
+const dateElement = document.querySelector("#date");
 
-btn.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        getWeather(city.value, unit.value, key);
-    }
-});
+let icons = new Skycons({color: '#E4D8D8'});
+
+icons.set("icon", "clear-day");
+icons.play();
 
 btn.addEventListener(`click`, (e) => {
-    e.preventDefault();
-    getWeather(city.value, unit.value, key);
+  e.preventDefault();
+  getWeather(city.value, unit.value, key);
 });
 
 async function getWeather(city, unit, key) {
-
-  let api = `https://api.openweathermap.org/data/2.5/weather?q=${city}${key}&units=${unit}`;
-  console.log(api);
-
+  let api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${key}`;
+  //   console.log(api);
   try {
     let response = await fetch(api);
     let data = await response.json();
-    console.log(data)
-
-    weather.temperature = data.main.temp;
-    weather.description = data.weather[0].description;
+    // console.log(data);
+    weather.temperature = Math.floor(data.main.temp);
+    weather.description = data.weather[0].main;
+    weather.icon = data.weather[0].icon;
     weather.city = data.name;
     weather.country = data.sys.country;
-    weather.feelsLike = data.main.feels_like;
+    weather.feelsLike = Math.floor(data.main.feels_like);
     weather.humidity = data.main.humidity;
     weather.windSpeed = data.wind.speed;
     weather.sunrise = convertUNIX(data.sys.sunrise);
     weather.sunset = convertUNIX(data.sys.sunset);
-    let currentDate = Math.round(date.getTime()/1000);
 
-    if (currentDate > data.sys.sunrise && currentDate < data.sys.sunset) {
-        weather.image = 'sun';
-    } else if (currentDate < data.sys.sunrise || currentDate > data.sys.sunset) {
-        weather.image = 'moon';
-    }
+    // let currentDate = Math.round(date.getTime() / 1000);
+
+    // if (currentDate > data.sys.sunrise && currentDate < data.sys.sunset) {
+    //   weather.image = "sun";
+    // } else if (
+    //   currentDate < data.sys.sunrise ||
+    //   currentDate > data.sys.sunset
+    // ) {
+    //   weather.image = "moon";
+    // }
 
     console.log(weather);
     console.log(data);
+
     displayWeather(weather);
-    }
-
-    catch (e) {
-        console.log(e);
-        displayError();
-    }
-}
-
-// DISPLAY PREFERRED UNIT
-
-let tempUnitDisplay = '';
-let windSpeedUnit = '';
-
-if (unit.value == 'metric') {
-    tempUnitDisplay = '°C';
-    windSpeedUnit = 'm/s'
-} else if (unit.value == 'imperial') {
-    tempUnitDisplay = '°F';
-    windSpeedUnit = 'miles/hour'
-} else {
-    tempUnitDisplay = 'K';
-    windSpeedUnit = 'm/s'
+  } catch (e) {
+    console.log(e);
+    displayError();
+  }
 }
 
 // CONVERT TIME FROM UNIX
 
-convertUNIX = timestamp => {
-    let date = new Date(timestamp * 1000);
-    let hours = date.getHours();
-    let minutes = "0" + date.getMinutes();
-    let seconds = "0" + date.getSeconds();
-    let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+function convertUNIX(timestamp) {
+  let date = new Date(timestamp * 1000);
+  let hours = date.getHours();
+  let minutes = "0" + date.getMinutes();
+  let seconds = "0" + date.getSeconds();
+  let formattedTime =
+    hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
 
-    return formattedTime;
+  return formattedTime;
 }
 
 // FORMAT CURRENT DATE
 
-currentDateFormat = date => {    
-const cDay = date.getDay();
-const cDate = date.getDate();
-// const cHours = date.getHours();
-// const cMinutes = date.getMinutes();
-const cMonth = date.getMonth();
-
-switch (cDay) {
+function currentDateFormat(date) {
+  const cDay = date.getDay();
+  const cDate = date.getDate();
+  // const cHours = date.getHours();
+  // const cMinutes = date.getMinutes();
+  const cMonth = date.getMonth();
+  let day = "";
+  let month = "";
+  switch (cDay) {
     case 0:
       day = "Sunday";
       break;
@@ -102,7 +95,7 @@ switch (cDay) {
       day = "Monday";
       break;
     case 2:
-       day = "Tuesday";
+      day = "Tuesday";
       break;
     case 3:
       day = "Wednesday";
@@ -117,99 +110,143 @@ switch (cDay) {
       day = "Saturday";
   }
 
-switch (cMonth) {
+  switch (cMonth) {
     case 0:
-        month = "Jan";
-        break;
+      month = "Jan";
+      break;
     case 1:
-        month = "Feb";
-        break;
+      month = "Feb";
+      break;
     case 2:
-        month = "Mar";
-        break;
+      month = "Mar";
+      break;
     case 3:
-        month = "Apr";
-        break;
+      month = "Apr";
+      break;
     case 4:
-        month = "May";
-        break;
+      month = "May";
+      break;
     case 5:
-        month = "Jun";
-        break;
+      month = "Jun";
+      break;
     case 6:
-        month = "Jul";
-        break;
+      month = "Jul";
+      break;
     case 7:
-        month = "Aug";
-        break;
+      month = "Aug";
+      break;
     case 8:
-        month = "Sep";
-        break;
+      month = "Sep";
+      break;
     case 9:
-        month = "Oct";
-        break;
+      month = "Oct";
+      break;
     case 10:
-        month = "Nov";
-        break;
+      month = "Nov";
+      break;
     case 11:
-        month = "Dec";
-        break;
-}
+      month = "Dec";
+      break;
+  }
 
-const compiledDate = `${day}, ${cDate} ${month}`
-return compiledDate;
+  const compiledDate = `${day}, ${cDate} ${month}`;
+  return compiledDate;
 }
 
 const dateToday = currentDateFormat(date);
+dateElement.innerHTML = `${dateToday}`
 
 // DISPLAY WEATHER TO UI
 
 function displayWeather(e) {
-    output.innerHTML = 
-    `<div class="cont-loc">
-        <div class="user-loc">
-            <p class = "location">${e.city}, ${e.country}</p>
-            <p class="dateToday">${dateToday}</p>
-        </div>
-        <div class="tempDisplay">
-        <figure class="icons">
-            <canvas id="icon" width="64" height="64"></canvas>
-        </figure>
-        <figure class="icons">
-            <canvas id="icon" width="64" height="64"></canvas>
-        </figure>
-            ${e.temperature} ${tempUnitDisplay}
-        </div>
-    </div>
-    <div class="info">
-        <div><span>Humidity<p>${e.humidity}%</span></div>
-        <div>Wind Speed<p>${e.windSpeed} ${windSpeedUnit}</span></div>
-        <div>Sunrise<p>${e.sunrise}</span></div>
-        <div>Sunset<p>${e.sunset}</span></div>
-    </div>
-    <div class="description"><p>${e.description}</p>
-    <p style="font-size: 1.5vw; margin-top: 1.5vh;">Feels like ${e.feelsLike}°</p></div>`;
+  // DISPLAY PREFERRED UNIT
+  let tempUnitDisplay = "";
+  let windSpeedUnit = "";
+
+  if (unit.value == "Metric") {
+    tempUnitDisplay = "°C";
+    windSpeedUnit = "m/s";
+  } else if (unit.value == "Imperial") {
+    tempUnitDisplay = "°F";
+    windSpeedUnit = " mph";
+  } else if (unit.value == "Standard") {
+    tempUnitDisplay = "K";
+    windSpeedUnit = "m/s";
+  }
+
+  status.innerHTML = `${e.description}`;
+  locationElement.innerHTML = `${e.city}, ${e.country}`;
+  temperature.innerHTML = `${e.temperature}${tempUnitDisplay}`;
+  feelsLike.innerHTML = `${e.feelsLike}${tempUnitDisplay}`;
+  humidity.innerHTML = `${e.humidity}%`;
+  windspeedElement.innerHTML = `${e.windSpeed}${windSpeedUnit}`;
+  sunrise.innerHTML = `${e.sunrise}`;
+  sunset.innerHTML = `${e.sunset}`;
+  
+  displaySkycons(weather.icon);
 }
 
-
-// ERROR 
+// ERROR
 function displayError() {
-    output.innerHTML = `<div class="error">Error 404</div>`;
+  status.innerHTML = `Error 405`;
+  locationElement.innerHTML = `Location not found`;
+  temperature.innerHTML = `TBD`;
+  feelsLike.innerHTML = `TBD`;
+  humidity.innerHTML = `TBD`;
+  windspeedElement.innerHTML = `TBD`;
+  sunrise.innerHTML = `TBD`;
+  sunset.innerHTML = `TBD`;
+  dateElement.innerHTML = `${dateToday}`;
+  displaySkycons("Error");
 }
 
-// SKYCONS 
+// SKYCONS
 
-let icons = new Skycons({"color": "white"});
+function displaySkycons(f) {
+  let icons = new Skycons({color: '#E4D8D8'});
+  sortSkycons(f);
+  icons.set("icon", weather.out);
+  icons.play();
+}
 
-icons.set("icon", "clear-day");
-// icons.set("clear-night", Skycons.CLEAR_NIGHT);
-// icons.set("partly-cloudy-day", Skycons.PARTLY_CLOUDY_DAY);
-// icons.set("partly-cloudy-night", Skycons.PARTLY_CLOUDY_NIGHT);
-// icons.set("cloudy", Skycons.CLOUDY);
-// icons.set("rain", Skycons.RAIN);
-// icons.set("sleet", Skycons.SLEET);
-// icons.set("snow", Skycons.SNOW);
-// icons.set("wind", Skycons.WIND);
-// icons.set("fog", Skycons.FOG);
-
-icons.play();
+function sortSkycons(e) {
+  console.log(e);
+  switch (e) {
+    case "01d":
+      weather.out = "clear-day";
+      break;
+    case "01n":
+      weather.out = "clear-night";
+      break;
+    case "02d":
+      weather.out = "partly-cloudy-day";
+      break;
+    case "02n":
+      weather.out = "partly-cloudy-night";
+      break;
+    case "03d":
+    case "03n":
+    case "04d":
+    case "04n":
+      weather.out = "cloudy";
+      break;
+    case "09d":
+    case "09n":
+    case "10d":
+    case "10n":
+    case "11d":
+    case "11n":
+      weather.out = "rain";
+      break;
+    case "13d":
+    case "13n":
+      weather.out = "snow";
+      break;
+    case "50d":
+    case "50n":
+      weather.out = "fog";
+      break;
+    case "Error":
+      weather.out = "wind";
+  }
+}
